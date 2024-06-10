@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('postagem', function (Blueprint $table) {
             $table->id();
             $table->string('descricao');
+            $table->string('img_url')->nullable();
             $table->timestamps();
         });
     }
