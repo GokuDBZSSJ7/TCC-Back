@@ -23,6 +23,7 @@ class User extends Authenticatable
         'cpf',
         'genero',
         'data_nascimento',
+        'img_url',
         'id_cidade',
         'id_estado',
     ];

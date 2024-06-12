@@ -28,6 +28,7 @@ class UserController extends Controller
             'cpf' => 'nullable|string',
             'genero' => 'nullable|string',
             'data_nascimento' => 'nullable',
+            'img_url' => 'nullable|string'
         ]);
 
         if($validator->fails()) {
@@ -61,5 +62,10 @@ class UserController extends Controller
         return $user;
     }
 
-    
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+        return response()->json(['message' => 'Excluido com sucesso']);
+    }
 }

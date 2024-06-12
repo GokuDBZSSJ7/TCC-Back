@@ -81,4 +81,70 @@ class AuthController extends Controller
         return [];
         return $user->getUserAllPermissions()->all();
     }
+
+    public function login(Request $request)
+    {
+        try {
+            $messages = [
+                "email.required" => "O campo de Email é obrigatório",
+                "senha.required" => "O campo de Senha é obrigatório",
+                "senha.min" => "O campo de Senha deve conter ao minímo 6 digítos"
+            ];
+
+            $validateUser = Validator::make($request->all(), [
+                'email' => 'required',
+                'senha' => 'required|min:6'
+            ], $messages);
+
+            if($validateUser->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'validation error',
+                    'errors' => $validateUser->errors()
+                ], 401);
+            }
+
+            if (!Auth::attempt($request->only(['email', 'senha']))) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Acesso não autorizado.',
+                ], 401);
+            }
+
+            $user = User::where('email', $request->email)->first();
+            if ($user->status === 0) {
+                return response()->json(['message' => 'Acesso bloqueado!'], 401);
+            }
+            return response()->json([
+                'status' => true,
+                'message' => 'User Logged In Successfully',
+                'access_token' => $user->createToken("API TOKEN")->plainTextToken
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+        $user = User::where('email', $request->email)->first();
+
+        if ($user) {
+            $newPassaword = 'politicos123';
+
+            $user->update([
+                'password' => bcrypt($newPassaword)
+            ]);
+
+            return response()->json(['message' => 'SENHA ATUALIZADA COM SUCESSO! NOVA SENHA: '.'politicos123'], 200); 
+        } else {
+            return response()->json(['message' => 'ERRO AO REDEFINIR SENHA!  '], 400);
+        }
+    }
 }
