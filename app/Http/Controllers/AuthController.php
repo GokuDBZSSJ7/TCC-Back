@@ -18,7 +18,7 @@ class AuthController extends Controller
         ];
 
         $valid = Validator::make($request->all(), [
-            'email' => 'nullable',
+            'email' => 'required',
             'senha' => 'required|min:6',
         ], $messages);
         
